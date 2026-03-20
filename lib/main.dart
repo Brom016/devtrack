@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router.dart';
+import 'data/services/seed_service.dart';
+import 'presentation/providers/providers.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -19,6 +21,9 @@ class DevTrackApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    ref.listen<AsyncValue<dynamic>>(authStateProvider, (_, next) {
+      if (next.valueOrNull != null) SeedService.seedDevices();
+    });
     return MaterialApp.router(
       title: 'DevTrack',
       theme: AppTheme.light,

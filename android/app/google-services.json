@@ -29,6 +29,13 @@
             {
               "client_id": "530515071966-n0sst6nsptlmfdtglsd70u3m8lie2kiq.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "530515071966-jmrvrc1rgf5uf14fiq0873ql235o6ht3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.devTrackApp"
+              }
             }
           ]
         }
