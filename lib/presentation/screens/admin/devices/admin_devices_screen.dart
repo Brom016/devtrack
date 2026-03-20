@@ -38,37 +38,112 @@ class AdminDevicesScreen extends ConsumerWidget {
     );
   }
 
-  void _addDialog(BuildContext context, WidgetRef ref) {
-    final idCtrl = TextEditingController();
-    final nameCtrl = TextEditingController();
-    final brandCtrl = TextEditingController();
-    String cat = AppConstants.deviceCategories.first;
-    showDialog(context: context, builder: (ctx) => StatefulBuilder(builder: (ctx, setS) => AlertDialog(
-      title: const Text('Tambah Device Baru'),
-      content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextField(controller: idCtrl, decoration: const InputDecoration(labelText: 'Asset ID', hintText: 'MOB-03')),
-        const SizedBox(height: 12),
-        TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nama Device')),
-        const SizedBox(height: 12),
-        TextField(controller: brandCtrl, decoration: const InputDecoration(labelText: 'Brand')),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(value: cat, decoration: const InputDecoration(labelText: 'Kategori'),
-          items: AppConstants.deviceCategories.map((k) => DropdownMenuItem(value: k, child: Text(k))).toList(),
-          onChanged: (v) => setS(() => cat = v ?? cat)),
-      ])),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-        FilledButton(onPressed: () async {
-          if (idCtrl.text.isEmpty || nameCtrl.text.isEmpty) return;
-          await ref.read(deviceRepositoryProvider).addDevice(DeviceModel(
-            deviceId: idCtrl.text.trim().toUpperCase(), name: nameCtrl.text.trim(),
-            brand: brandCtrl.text.trim(), category: cat, status: AppConstants.statusAvailable,
-          ));
-          if (ctx.mounted) Navigator.pop(ctx);
-        }, child: const Text('Simpan')),
-      ],
-    )));
-  }
+void _addDialog(BuildContext context, WidgetRef ref) {
+  final idCtrl = TextEditingController();
+  final nameCtrl = TextEditingController();
+  final brandCtrl = TextEditingController();
+  final imageCtrl = TextEditingController();
+  String cat = AppConstants.deviceCategories.first;
+
+  showDialog(
+    context: context,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setS) => AlertDialog(
+        title: const Text('Tambah Device Baru'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: idCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Asset ID',
+                  hintText: 'MOB-03',
+                  prefixIcon: Icon(Icons.qr_code),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Nama Device',
+                  hintText: 'iPhone 15 Pro',
+                  prefixIcon: Icon(Icons.devices),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: brandCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Brand',
+                  hintText: 'Apple',
+                  prefixIcon: Icon(Icons.business),
+                ),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: cat,
+                decoration: const InputDecoration(
+                  labelText: 'Kategori',
+                  prefixIcon: Icon(Icons.category),
+                ),
+                items: AppConstants.deviceCategories
+                    .map((k) => DropdownMenuItem(value: k, child: Text(k)))
+                    .toList(),
+                onChanged: (v) => setS(() => cat = v ?? cat),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: imageCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'URL Gambar (opsional)',
+                  hintText: 'https://...',
+                  prefixIcon: Icon(Icons.image_outlined),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tip: upload gambar ke imgbb.com atau imgur.com lalu paste URL-nya',
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              if (idCtrl.text.isEmpty || nameCtrl.text.isEmpty) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(content: Text('Asset ID dan Nama wajib diisi')),
+                );
+                return;
+              }
+              await ref.read(deviceRepositoryProvider).addDevice(
+                DeviceModel(
+                  deviceId: idCtrl.text.trim().toUpperCase(),
+                  name: nameCtrl.text.trim(),
+                  brand: brandCtrl.text.trim(),
+                  category: cat,
+                  status: AppConstants.statusAvailable,
+                  qrCodeUrl: imageCtrl.text.trim(),
+                ),
+              );
+              if (ctx.mounted) Navigator.pop(ctx);
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   void _optionsSheet(BuildContext context, WidgetRef ref, DeviceModel d) {
     showModalBottomSheet(context: context,

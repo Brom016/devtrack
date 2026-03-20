@@ -106,13 +106,15 @@ class AuthService {
   }
 
   Stream<UserModel?> watchCurrentUser() {
-    final user = _auth.currentUser;
-    if (user == null) return Stream.value(null);
-    return _db
-        .collection(AppConstants.colUsers)
-        .doc(user.uid)
-        .snapshots()
-        .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
+    // Ikuti perubahan auth state secara realtime
+    return _auth.authStateChanges().asyncExpand((user) {
+      if (user == null) return Stream.value(null);
+      return _db
+          .collection(AppConstants.colUsers)
+          .doc(user.uid)
+          .snapshots()
+          .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
+    });
   }
 
   Future<void> signOut() async {

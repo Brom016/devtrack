@@ -12,8 +12,11 @@ final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 final authStateProvider = StreamProvider<User?>((ref) =>
     ref.watch(authServiceProvider).authStateChanges);
 
-final currentUserModelProvider = StreamProvider<UserModel?>((ref) =>
-    ref.watch(authServiceProvider).watchCurrentUser());
+final currentUserModelProvider = StreamProvider<UserModel?>((ref) {
+  // Watch auth state dulu supaya provider rebuild saat user berganti
+  ref.watch(authStateProvider);
+  return ref.watch(authServiceProvider).watchCurrentUser();
+});
 
 final deviceRepositoryProvider = Provider<DeviceRepository>((ref) => DeviceRepository());
 
