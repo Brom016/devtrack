@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/models/device_model.dart';
 import 'common/common_widgets.dart';
+import 'dart:convert';
 
 class DeviceCard extends StatelessWidget {
   final DeviceModel device;
@@ -19,10 +20,12 @@ class DeviceCard extends StatelessWidget {
   }
 
  @override
+@override
 Widget build(BuildContext context) {
   final isAvail = device.isAvailable;
-  final hasImage = device.qrCodeUrl.isNotEmpty &&
-      device.qrCodeUrl.startsWith('http');
+  final hasImage = device.qrCodeUrl.isNotEmpty;
+  final isBase64 = device.qrCodeUrl.startsWith('data:image');
+  final isUrl = device.qrCodeUrl.startsWith('http');
 
   return Card(
     child: InkWell(
@@ -33,17 +36,11 @@ Widget build(BuildContext context) {
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            // Gambar atau icon kategori
+            // Gambar device
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: hasImage
-                  ? Image.network(
-                      device.qrCodeUrl,
-                      width: 52,
-                      height: 52,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _iconBox(isAvail),
-                    )
+                  ? _buildImage(isBase64, isUrl)
                   : _iconBox(isAvail),
             ),
             const SizedBox(width: 12),
@@ -89,6 +86,31 @@ Widget build(BuildContext context) {
       ),
     ),
   );
+}
+
+Widget _buildImage(bool isBase64, bool isUrl) {
+  try {
+    if (isBase64) {
+      final base64Str = device.qrCodeUrl.split(',').last;
+      final bytes = base64Decode(base64Str);
+      return Image.memory(
+        bytes,
+        width: 52,
+        height: 52,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _iconBox(device.isAvailable),
+      );
+    } else if (isUrl) {
+      return Image.network(
+        device.qrCodeUrl,
+        width: 52,
+        height: 52,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _iconBox(device.isAvailable),
+      );
+    }
+  } catch (_) {}
+  return _iconBox(device.isAvailable);
 }
 
 Widget _iconBox(bool isAvail) {

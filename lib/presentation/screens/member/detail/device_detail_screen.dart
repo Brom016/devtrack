@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
 import '../../../providers/providers.dart';
 import '../../../widgets/common/common_widgets.dart';
 
@@ -11,6 +12,7 @@ class DeviceDetailScreen extends ConsumerStatefulWidget {
   const DeviceDetailScreen({super.key, required this.deviceId});
   @override
   ConsumerState<DeviceDetailScreen> createState() => _State();
+  
 }
 
 class _State extends ConsumerState<DeviceDetailScreen> {
@@ -70,6 +72,29 @@ class _State extends ConsumerState<DeviceDetailScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+
+  Widget _buildDetailImage(String imageData) {
+  try {
+    if (imageData.startsWith('data:image')) {
+      final base64Str = imageData.split(',').last;
+      final bytes = base64Decode(base64Str);
+      return Image.memory(
+        bytes,
+        width: double.infinity,
+        height: 200,
+        fit: BoxFit.cover,
+      );
+    } else if (imageData.startsWith('http')) {
+      return Image.network(
+        imageData,
+        width: double.infinity,
+        height: 200,
+        fit: BoxFit.cover,
+      );
+    }
+  } catch (_) {}
+  return const SizedBox();
+}
 
   Future<void> _kembalikan(String id) async {
     final firebaseUser = FirebaseAuth.instance.currentUser!;
@@ -194,30 +219,11 @@ class _State extends ConsumerState<DeviceDetailScreen> {
                               valueColor: device.isOverdue ? Colors.red : null,
                             ),
                         ],
-                        if (device.qrCodeUrl.isNotEmpty &&
-                            device.qrCodeUrl.startsWith('http')) ...[
+                        if (device.qrCodeUrl.isNotEmpty) ...[
                           const SizedBox(height: 12),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              device.qrCodeUrl,
-                              width: double.infinity,
-                              height: 180,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.broken_image_outlined,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            child: _buildDetailImage(device.qrCodeUrl),
                           ),
                         ],
                       ],
