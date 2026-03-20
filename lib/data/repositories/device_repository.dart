@@ -70,4 +70,6 @@ class DeviceRepository {
     });
     await batch.commit();
   }
+  Future<void> updateDevice(String id, Map<String, dynamic> data) async =>
+      _db.collection(AppConstants.colDevices).doc(id).update(data);
 }
