@@ -28,10 +28,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
-      final result = await ref.read(authServiceProvider).signInWithEmail(
-            email: _emailCtrl.text,
-            password: _passCtrl.text,
-          );
+      final result = await ref
+          .read(authServiceProvider)
+          .signInWithEmail(email: _emailCtrl.text, password: _passCtrl.text);
       if (result != null && mounted) context.go('/home');
     } on Exception catch (e) {
       if (mounted) _showError(e.toString().replaceAll('Exception: ', ''));
@@ -57,8 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleGoogleLogin() async {
     setState(() => _isLoading = true);
     try {
-      final result =
-          await ref.read(authServiceProvider).signInWithGoogle();
+      final result = await ref.read(authServiceProvider).signInWithGoogle();
       if (result != null && mounted) context.go('/home');
     } on Exception catch (e) {
       if (mounted) _showError(e.toString().replaceAll('Exception: ', ''));
@@ -94,17 +92,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 48),
 
                 // ── Logo ──────────────────────────
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1565C0),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.devices_rounded,
-                    color: Colors.white,
-                    size: 42,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/icon/app_icon.png',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -119,10 +113,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 4),
                 Text(
                   'Asset Management System',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 36),
 
@@ -138,15 +129,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         label: 'Email & Password',
                         icon: Icons.email_outlined,
                         selected: _loginMethod == 'email',
-                        onTap: () =>
-                            setState(() => _loginMethod = 'email'),
+                        onTap: () => setState(() => _loginMethod = 'email'),
                       ),
                       _TabButton(
                         label: 'Google',
                         icon: Icons.login_rounded,
                         selected: _loginMethod == 'google',
-                        onTap: () =>
-                            setState(() => _loginMethod = 'google'),
+                        onTap: () => setState(() => _loginMethod = 'google'),
                       ),
                     ],
                   ),
@@ -230,8 +219,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_amber_outlined,
-                            color: Colors.orange.shade700, size: 18),
+                        Icon(
+                          Icons.warning_amber_outlined,
+                          color: Colors.orange.shade700,
+                          size: 18,
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -286,8 +278,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline,
-                          color: Colors.blue.shade700, size: 16),
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.blue.shade700,
+                        size: 16,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -305,10 +300,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 24),
                 Text(
                   'DevTrack v1.0.0',
-                  style: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 11),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -351,7 +343,7 @@ class _TabButton extends StatelessWidget {
                       color: Colors.black.withOpacity(0.08),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
-                    )
+                    ),
                   ]
                 : [],
           ),
@@ -370,9 +362,7 @@ class _TabButton extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: selected
-                      ? FontWeight.w600
-                      : FontWeight.normal,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
                   color: selected
                       ? const Color(0xFF1565C0)
                       : Colors.grey.shade500,
